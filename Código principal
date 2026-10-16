@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Balcão</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ccc;
+        }
+        .tab-button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            font-weight: bold;
+            color: #555;
+            outline: none;
+        }
+        .tab-button.active {
+            color: #007bff;
+            border-bottom: 3px solid #007bff;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .disclaimer {
+            font-size: 11px;
+            color: #777;
+            margin-top: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>💊 Calculadora de Balcão</h1>
+    
+    <div class="tabs">
+        <button class="tab-button active" onclick="openTab(event, 'comprimidos')">💊 Comprimidos</button>
+        <button class="tab-button" onclick="openTab(event, 'gotas')">💧 Gotas</button>
+        <button class="tab-button" onclick="openTab(event, 'solucoes')">🧪 Soluções (mL)</button>
+    </div>
+
+    <!-- Comprimidos -->
+    <div id="comprimidos" class="tab-content active">
+        <div class="form-group">
+            <label>Dose (Qtd. de comprimidos por tomada):</label>
+            <input type="number" id="comp_dose" step="any" min="0">
+        </div>
+        <div class="form-group">
+            <label>Frequência (Vezes por dia):</label>
+            <input type="number" id="comp_freq" min="0">
+        </div>
+        <div class="form-group">
+            <label>Duração do Tratamento (Dias):</label>
+            <input type="number" id="comp_duracao" min="0">
+        </div>
+        <div class="form-group">
+            <label>Qtd. de comprimidos na caixa comercial:</label>
+            <input type="number" id="comp_caixa" min="1">
+        </div>
+        <button onclick="calcularComprimidos()">Calcular Dispensação</button>
+        
+        <div class="result">
+            <h3>Resultado:</h3>
+            <p>Total de comprimidos necessários: <span id="res_comp_total">-</span></p>
+            <p>Quantidade de caixas a entregar: <span id="res_comp_caixas">-</span></p>
+        </div>
+    </div>
+
+    <!-- Gotas -->
+    <div id="gotas" class="tab-content">
+        <div class="form-group">
+            <label>Dose (Qtd. de gotas por tomada):</label>
+            <input type="number" id="gotas_dose" min="0">
+        </div>
+        <div class="form-group">
+            <label>Frequência (Vezes por dia):</label>
+            <input type="number" id="gotas_freq" min="0">
+        </div>
+        <div class="form-group">
+            <label>Duração do Tratamento (Dias):</label>
+            <input type="number" id="gotas_duracao" min="0">
+        </div>
+        <div class="form-group">
+            <label>Volume do Frasco comercial (mL):</label>
+            <input type="number" id="gotas_volume" min="1">
+        </div>
+        <button onclick="calcularGotas()">Calcular Dispensação</button>
+        
+        <div class="result">
+            <h3>Resultado:</h3>
+            <p>Total de gotas necessárias: <span id="res_gotas_total">-</span></p>
+            <p>Volume total necessário (mL) [Aprox. 20gts/mL]: <span id="res_gotas_volume">-</span></p>
+            <p>Quantidade de frascos a entregar: <span id="res_gotas_frascos">-</span></p>
+        </div>
+    </div>
+
+    <!-- Soluções (mL) -->
+    <div id="solucoes" class="tab-content">
+        <div class="form-group">
+            <label>Dose por tomada (mL):</label>
+            <input type="number" id="sol_dose" step="any" min="0">
+        </div>
+        <div class="form-group">
+            <label>Frequência (Vezes por dia):</label>
+            <input type="number" id="sol_freq" min="0">
+        </div>
+        <div class="form-group">
+            <label>Duração do Tratamento (Dias):</label>
+            <input type="number" id="sol_duracao" min="0">
+        </div>
+        <div class="form-group">
+            <label>Volume do Frasco comercial (mL):</label>
+            <input type="number" id="sol_volume" min="1">
+        </div>
+        <button onclick="calcularSolucoes()">Calcular Dispensação</button>
+        
+        <div class="result">
+            <h3>Resultado:</h3>
+            <p>Volume total necessário (mL): <span id="res_sol_total">-</span></p>
+            <p>Quantidade de frascos a entregar: <span id="res_sol_frascos">-</span></p>
+        </div>
+    </div>
+
+    <div class="disclaimer">
+        This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.
+    </div>
+</div>
+
+<script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+        }
+        tablinks = document.getElementsByClassName("tab-button");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).className += " active";
+        evt.currentTarget.className += " active";
+    }
+
+    function calcularComprimidos() {
+        var dose = parseFloat(document.getElementById('comp_dose').value) || 0;
+        var freq = parseInt(document.getElementById('comp_freq').value) || 0;
+        var duracao = parseInt(document.getElementById('comp_duracao').value) || 0;
+        var caixa = parseInt(document.getElementById('comp_caixa').value) || 1;
+
+        var total = dose * freq * duracao;
+        var caixas = Math.ceil(total / caixa);
+
+        document.getElementById('res_comp_total').innerText = total;
+        document.getElementById('res_comp_caixas').innerText = caixas;
+    }
+
+    function calcularGotas() {
+        var dose = parseInt(document.getElementById('gotas_dose').value) || 0;
+        var freq = parseInt(document.getElementById('gotas_freq').value) || 0;
+        var duracao = parseInt(document.getElementById('gotas_duracao').value) || 0;
+        var volumeFrasco = parseFloat(document.getElementById('gotas_volume').value) || 1;
+
+        var totalGotas = dose * freq * duracao;
+        var volumeTotal = totalGotas / 20; // Padrão de mercado: 20 gotas por mL
+        var frascos = Math.ceil(volumeTotal / volumeFrasco);
+
+        document.getElementById('res_gotas_total').innerText = totalGotas;
+        document.getElementById('res_gotas_volume').innerText = volumeTotal.toFixed(2);
+        document.getElementById('res_gotas_frascos').innerText = frascos;
+    }
+
+    function calcularSolucoes() {
+        var dose = parseFloat(document.getElementById('sol_dose').value) || 0;
+        var freq = parseInt(document.getElementById('sol_freq').value) || 0;
+        var duracao = parseInt(document.getElementById('sol_duracao').value) || 0;
+        var volumeFrasco = parseFloat(document.getElementById('sol_volume').value) || 1;
+
+        var volumeTotal = dose * freq * duracao;
+        var frascos = Math.ceil(volumeTotal / volumeFrasco);
+
+        document.getElementById('res_sol_total').innerText = volumeTotal.toFixed(2);
+        document.getElementById('res_sol_frascos').innerText = frascos;
+    }
+</script>
+
+</body>
+</html>
